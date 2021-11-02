@@ -44,9 +44,18 @@ class UiTest : PApplet() {
                 }
                 Row {
                     Content {
-                        Article()
-                        Article()
-                        Article()
+                        Article(
+                            title = "Vae, ferox acipenser!",
+                            description = "Per guest prepare one cup of honey with toasted mackerel for dessert.",
+                        )
+                        Article(
+                            title = "Agripetas sunt resistentias de raptus cursus.",
+                            description = "Mackerel tastes best with condensed milk and lots of mustard.",
+                        )
+                        Article(
+                            title = "Cur clabulare prarere?",
+                            description = "Chocolate stew has to have a raw, chilled tofu component.",
+                        )
                     }
                     Sidebar {
                         SidebarItem()
@@ -124,23 +133,29 @@ class UiTest : PApplet() {
         }
     }
 
-    fun UiBuilder.Article() = add {
+    fun UiBuilder.Article(
+        title: String,
+        description: String,
+    ) = add {
         Row(
             gap = commonPadding,
-            height = AbsoluteSize(80f),
+            height = ContentSize,
         ) {
             Rectangle(
                 color = Color(0xC4C4C4),
                 width = AbsoluteSize(80f),
+                height = AbsoluteSize(80f),
             )
-            Column {
-                Rectangle(
-                    color = Color(0x818181),
-                )
-                Rectangle(
-                    color = Color(0xC4C4C4),
-                    height = FractionalSize(2f),
-                )
+            Column(
+                height = ContentSize,
+                background = Color(0x000000)
+            ) {
+                TextContainer(padding = PaddingValues.vertical(4f, 6f)) {
+                    Text(title, style = TextStyle(font, size = 16f))
+                }
+                TextContainer {
+                    Text(description, style = TextStyle(font))
+                }
             }
         }
     }
@@ -164,26 +179,19 @@ class UiTest : PApplet() {
      */
     fun buildTestUi2() = buildRootUi {
         Box(
-            background = Color.BLUE,
+            background = Color.white,
             padding = PaddingValues.of(10f),
             height = ContentSize,
         ) {
-            FlexRow(
-                background = Color.CYAN,
-                padding = PaddingValues.of(10f),
-                height = ContentSize,
-                gap = 10f,
-                horizontalAlignment = CenterAlignment,
-                verticalAlignment = CenterAlignment,
-                verticalContainerAlignment = EndAlignment,
+            TextContainer(
+                verticalAlignment = EndAlignment
             ) {
-                (1..100).forEach {
-                    Rectangle(
-                        color = Color.RED,
-                        width = Random.nextInt(10, 50).dp,
-                        height = Random.nextInt(5, 50).dp,
-                    )
-                }
+                Text("sdf sdf sdfd!\n", style = TextStyle(font, bold = true, underline = false, size = 32f))
+                Text("sdf sdf sdfd sfsd fsdf!\n", style = TextStyle(font, bold = true, underline = true, size = 32f))
+                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf!\n", style = TextStyle(font, bold = true, underline = false, size = 32f))
+                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf sdf sdf sdfd!\n", style = TextStyle(font, bold = true, underline = true, size = 32f))
+                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf sdf sdf sdfd sfsd fsdf!\n", style = TextStyle(font, bold = true, underline = false, size = 32f))
+                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf sdf sdf sdfd sfsd fsdf ds fsd fds fsdf!\n", style = TextStyle(font, bold = true, underline = true, size = 32f))
             }
         }
     }
@@ -204,7 +212,7 @@ class UiTest : PApplet() {
         root.height = height.toFloat()
         root.measure(null)
         renderer.render(root)
-        strokedText("FPS: ${frameRate.roundToInt()}", 10f, 20f)
+        strokedText("FPS: ${frameRate.roundToInt()} [${width}x$height]", 10f, height - 10f)
     }
 
     fun strokedText(string: String, x: Float, y: Float) {

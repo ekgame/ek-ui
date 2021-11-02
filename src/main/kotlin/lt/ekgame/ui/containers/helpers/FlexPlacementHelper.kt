@@ -15,17 +15,17 @@ class FlexPlacementHelper {
 
     fun getCurrentBucket(): List<Placeable> = buckets.last()
 
-    fun getCurrentBucketWidth(gap: Float) = getCurrentBucket().map { (it.width ?: 0f) + gap }.sum()
+    fun getCurrentBucketWidth(gap: Float = 0f) = getCurrentBucket().map { (it.width ?: 0f) + gap }.sum()
 
-    fun getCurrentBucketHeight(gap: Float) = getCurrentBucket().map { (it.height ?: 0f) + gap }.sum()
+    fun getCurrentBucketHeight(gap: Float = 0f) = getCurrentBucket().map { (it.height ?: 0f) + gap }.sum()
 
     fun getNumBuckets() = buckets.size
 
     fun getBucket(index: Int): List<Placeable> = buckets[index]
 
-    fun getBucketWidth(index: Int, gap: Float): Float = getBucket(index).map { (it.width ?: 0f) + gap }.sum() - gap
+    fun getBucketWidth(index: Int, gap: Float = 0f): Float = getBucket(index).map { (it.width ?: 0f) + gap }.sum() - gap
 
-    fun getBucketHeight(index: Int, gap: Float): Float = getBucket(index).map { (it.height ?: 0f) + gap }.sum() - gap
+    fun getBucketHeight(index: Int, gap: Float = 0f): Float = getBucket(index).map { (it.height ?: 0f) + gap }.sum() - gap
 
     fun getBucketMaxWidth(index: Int): Float = getBucket(index).maxOf { it.width ?: 0f }
 

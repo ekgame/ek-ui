@@ -23,7 +23,7 @@ class ProcessingRenderer(val context: PApplet) : ElementRenderer {
     fun PApplet.color(color: Color) = this.color(color.red, color.green, color.blue, color.alpha)
 
     fun render(element: AbstractContainer) {
-        element.children.forEach(::render)
+        element.computedChildren.forEach(::render)
     }
 
     fun render(element: GenericContainer) {
@@ -67,5 +67,12 @@ class ProcessingRenderer(val context: PApplet) : ElementRenderer {
         context.textFont(font.nativeFont)
         context.textSize(style.size)
         context.text(element.text, posX, posY + context.textAscent())
+
+        if (style.underline) {
+            val width = font.measureWidth(element.text, style)
+            val yPos =  posY + context.textAscent() + 3
+            context.stroke(context.color(style.color))
+            context.line(posX, yPos, posX + width, yPos)
+        }
     }
 }

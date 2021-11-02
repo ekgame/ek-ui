@@ -37,6 +37,8 @@ interface Element {
 
 interface Container : Element {
     val children: List<Element>
+    val computedChildren: List<Element>
+        get() = children
     val padding: PaddingValues
     val verticalFractionalSpace: FractionalSpace?
     val horizontalFractionalSpace: FractionalSpace?

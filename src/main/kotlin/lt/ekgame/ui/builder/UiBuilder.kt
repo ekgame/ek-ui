@@ -230,17 +230,35 @@ fun UiBuilder.Rectangle(
 fun UiBuilder.Text(
     text: String,
     style: TextStyle,
-    width: Size = ContentSize,
-    height: Size = ContentSize,
-    minWidth: Size = width,
-    minHeight: Size = height,
-    maxWidth: Size = width,
-    maxHeight: Size = height,
 ) = addElement {
     TextLineElement(
         it,
         text = text,
         style = style,
+    )
+}
+
+fun UiBuilder.TextContainer(
+    background: Color? = null,
+    padding: PaddingValues = PaddingValues.ZERO,
+    horizontalAlignment: Alignment = StartAlignment,
+    verticalAlignment: Alignment = StartAlignment,
+    tracking: Float = 0f,
+    width: Size = MaxAvailable,
+    height: Size = ContentSize,
+    minWidth: Size = width,
+    minHeight: Size = height,
+    maxWidth: Size = width,
+    maxHeight: Size = height,
+    builder: UiBuilder.() -> Unit
+) = addContainer(builder) {
+    TextContainer(
+        it,
+        background = background,
+        padding = padding,
+        horizontalAlignment = horizontalAlignment,
+        verticalAlignment = verticalAlignment,
+        tracking = tracking,
         size = SizeConstraints(
             width = width,
             height = height,
