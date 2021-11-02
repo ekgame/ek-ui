@@ -149,9 +149,10 @@ class UiTest : PApplet() {
             Column(
                 id = "article",
                 height = ContentSize,
-                background = Color(0x000000)
             ) {
-                TextContainer(padding = PaddingValues.vertical(4f, 6f)) {
+                TextContainer(
+                    padding = PaddingValues.vertical(4f, 6f)
+                ) {
                     Text(title, style = TextStyle(font, size = 16f))
                 }
                 TextContainer {

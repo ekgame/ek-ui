@@ -34,7 +34,7 @@ open class ColumnContainer(
 
     private fun getGapSize(): Float = (children.size - 1).coerceAtLeast(0)*gap
 
-    private fun getTotalChildHeightWithGaps(): Float = getTotalChildWidth() + getGapSize()
+    private fun getTotalChildHeightWithGaps(): Float = getTotalChildHeight() + getGapSize()
 
     override fun measure(container: Container?): Boolean {
         if (!super.measure(container) || !isValidPlaceable()) {
