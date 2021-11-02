@@ -17,7 +17,7 @@ open class FlexRowContainer(
     val verticalContainerAlignment: Alignment = StartAlignment,
 ) : GenericContainer(id, parent, size, padding, background) {
 
-    private fun getTotalGapSize(): Float = (children.size - 1).coerceAtLeast(0)*gap
+    private fun getTotalGapSize(): Float = (computedChildren.size - 1).coerceAtLeast(0)*gap
 
     private fun getTotalChildWidthWithGaps(): Float = getTotalChildWidth() + getTotalGapSize()
 
@@ -76,7 +76,7 @@ open class FlexRowContainer(
     override fun recalculateContainerHeight(container: Container?) {
         placeable.height = applyMinMaxHeight(when {
             this.size.height is ContentSize && placeable.width != null -> {
-                val flex = calculateFlex(children.asPlaceables())
+                val flex = calculateFlex(computedChildren.asPlaceables())
                 flex.getTotalHeight(gap) + this.padding.vertical
             }
             else -> placeable.height

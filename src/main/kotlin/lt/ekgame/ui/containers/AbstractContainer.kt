@@ -30,7 +30,7 @@ abstract class AbstractContainer(
 
     protected fun getTotalChildHeight() = children.mapNotNull { it.placeable.height }.sum()
 
-    protected fun getRemeasuredChildren(container: Container?): List<Placeable> = children
+    protected fun getRemeasuredChildren(container: Container?): List<Placeable> = computedChildren
         .asSequence()
         .map {
             if (it.placeable.width == null || it.placeable.height == null) {
@@ -44,7 +44,7 @@ abstract class AbstractContainer(
         }
 
     override fun measure(container: Container?): Boolean {
-        children.forEach {
+        computedChildren.forEach {
             it.placeable.reset()
             it.measure(this)
         }

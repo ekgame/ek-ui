@@ -17,7 +17,7 @@ open class ColumnContainer(
 
     override val verticalFractionalSpace = object : FractionalSpace {
         override val totalFraction: Float
-            get() = children.asSequence()
+            get() = computedChildren.asSequence()
                 .map { it.size.height }
                 .filterIsInstance<FractionalSize>()
                 .map { it.fraction }
@@ -27,7 +27,7 @@ open class ColumnContainer(
             get() = getEffectiveHeight() - totalNonFractionalChildSize
 
         val totalNonFractionalChildSize: Float
-            get() = children.filter { it.size.height !is FractionalSize }.mapNotNull { it.placeable.height }.sum()
+            get() = computedChildren.filter { it.size.height !is FractionalSize }.mapNotNull { it.placeable.height }.sum()
     }
 
     override fun getEffectiveHeight(): Float = getInnerHeight() - getGapSize()

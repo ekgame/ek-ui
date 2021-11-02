@@ -17,7 +17,7 @@ open class FlexColumnContainer(
     val verticalAlignment: Alignment = StartAlignment,
 ) : GenericContainer(id, parent, size, padding, background) {
 
-    private fun getTotalGapSize(): Float = (children.size - 1).coerceAtLeast(0)*gap
+    private fun getTotalGapSize(): Float = (computedChildren.size - 1).coerceAtLeast(0)*gap
 
     private fun getTotalChildHeightWithGaps(): Float = getTotalChildHeight() + getTotalGapSize()
 
@@ -69,7 +69,7 @@ open class FlexColumnContainer(
     override fun recalculateContainerWidth(container: Container?) {
         placeable.width = applyMinMaxWidth(when {
             this.size.width is ContentSize && placeable.height != null -> {
-                val flex = calculateFlex(children.asPlaceables())
+                val flex = calculateFlex(computedChildren.asPlaceables())
                 flex.getTotalWidth(gap) + this.padding.horizontal
             }
             else -> placeable.width

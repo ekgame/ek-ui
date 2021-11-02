@@ -17,7 +17,7 @@ open class RowContainer(
 
     override val horizontalFractionalSpace = object : FractionalSpace {
         override val totalFraction: Float
-            get() = children.asSequence()
+            get() = computedChildren.asSequence()
                 .map { it.size.width }
                 .filterIsInstance<FractionalSize>()
                 .map { it.fraction }
@@ -27,12 +27,12 @@ open class RowContainer(
             get() = getEffectiveWidth() - totalNonFractionalChildSize
 
         val totalNonFractionalChildSize: Float
-            get() = children.filter { it.size.width !is FractionalSize }.mapNotNull { it.placeable.width }.sum()
+            get() = computedChildren.filter { it.size.width !is FractionalSize }.mapNotNull { it.placeable.width }.sum()
     }
 
     override fun getEffectiveWidth(): Float = getInnerWidth() - getGapSize()
 
-    private fun getGapSize(): Float = (children.size - 1).coerceAtLeast(0)*gap
+    private fun getGapSize(): Float = (computedChildren.size - 1).coerceAtLeast(0)*gap
 
     private fun getTotalChildWidthWithGaps(): Float = getTotalChildWidth() + getGapSize()
 
