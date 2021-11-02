@@ -10,7 +10,7 @@ import processing.core.PApplet
 class RootContainer(
     var width: Float = 0f,
     var height: Float = 0f,
-) : BoxContainer(null) {
+) : BoxContainer("root", null) {
 
     override val placeable = object : Placeable {
         override val element: Element

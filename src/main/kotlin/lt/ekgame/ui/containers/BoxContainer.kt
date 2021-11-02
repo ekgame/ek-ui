@@ -7,13 +7,14 @@ import lt.ekgame.ui.constraints.*
 import java.awt.Color
 
 open class BoxContainer(
+    id: String = "",
     parent: Element?,
     size: SizeConstraints = SizeConstraints.DEFAULT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,
     val verticalAlignment: Alignment = StartAlignment,
     val horizontalAlignment: Alignment = StartAlignment,
-) : GenericContainer(parent, size, padding, background) {
+) : GenericContainer(id, parent, size, padding, background) {
 
     override fun measure(container: Container?): Boolean {
         if (!super.measure(container) || !isValidPlaceable()) {

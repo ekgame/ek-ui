@@ -4,6 +4,7 @@ import lt.ekgame.ui.*
 import lt.ekgame.ui.constraints.*
 
 abstract class AbstractElement(
+    override val id: String,
     override val parent: Element?,
     override val size: SizeConstraints = SizeConstraints.DEFAULT,
 ) : Element {

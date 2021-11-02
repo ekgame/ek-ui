@@ -10,6 +10,7 @@ import lt.ekgame.ui.elements.TextLineElement
 import java.awt.Color
 
 class TextContainer(
+    id: String = "",
     parent: Element?,
     size: SizeConstraints = SizeConstraints.CONTENT,
     padding: PaddingValues = PaddingValues.ZERO,
@@ -19,7 +20,7 @@ class TextContainer(
     val tracking: Float = 4f,
     val horizontalAlignment: Alignment = StartAlignment,
     val verticalAlignment: Alignment = StartAlignment,
-) : GenericContainer(parent, size, padding, background) {
+) : GenericContainer(id, parent, size, padding, background) {
 
     private val flexChildren = mutableListOf<Element>()
     override val computedChildren: List<Element>

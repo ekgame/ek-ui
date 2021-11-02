@@ -11,10 +11,11 @@ import lt.ekgame.ui.constraints.SizeConstraints
 import processing.core.PApplet
 
 abstract class AbstractContainer(
+    id: String = "",
     override val parent: Element? = null,
     override val size: SizeConstraints = SizeConstraints.DEFAULT,
     override val padding: PaddingValues = PaddingValues.ZERO,
-) : AbstractElement(parent, size), Container {
+) : AbstractElement(id, parent, size), Container {
     override val children: MutableList<Element> = mutableListOf()
 
     override val verticalFractionalSpace: FractionalSpace? = null

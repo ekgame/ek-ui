@@ -28,6 +28,7 @@ interface Placeable {
 }
 
 interface Element {
+    val id: String
     val parent: Element?
     val size: SizeConstraints
     val placeable: Placeable

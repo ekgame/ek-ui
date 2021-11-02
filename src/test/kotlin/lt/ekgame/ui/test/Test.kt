@@ -147,6 +147,7 @@ class UiTest : PApplet() {
                 height = AbsoluteSize(80f),
             )
             Column(
+                id = "article",
                 height = ContentSize,
                 background = Color(0x000000)
             ) {

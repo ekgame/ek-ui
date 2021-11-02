@@ -43,6 +43,7 @@ fun buildRootUi(builder: UiBuilder.() -> Unit): RootContainer {
 }
 
 fun UiBuilder.Row(
+    id: String = "",
     width: Size = MaxAvailable,
     height: Size = MaxAvailable,
     minWidth: Size = width,
@@ -57,6 +58,7 @@ fun UiBuilder.Row(
     builder: UiBuilder.() -> Unit
 ) = addContainer(builder) {
     RowContainer(
+        id,
         it,
         padding = padding,
         background = background,
@@ -75,6 +77,7 @@ fun UiBuilder.Row(
 }
 
 fun UiBuilder.FlexRow(
+    id: String = "",
     width: Size = MaxAvailable,
     height: Size = ContentSize,
     minWidth: Size = width,
@@ -90,6 +93,7 @@ fun UiBuilder.FlexRow(
     builder: UiBuilder.() -> Unit
 ) = addContainer(builder) {
     FlexRowContainer(
+        id,
         it,
         padding = padding,
         background = background,
@@ -109,6 +113,7 @@ fun UiBuilder.FlexRow(
 }
 
 fun UiBuilder.FlexColumn(
+    id: String = "",
     width: Size = ContentSize,
     height: Size = MaxAvailable,
     minWidth: Size = width,
@@ -124,6 +129,7 @@ fun UiBuilder.FlexColumn(
     builder: UiBuilder.() -> Unit
 ) = addContainer(builder) {
     FlexColumnContainer(
+        id,
         it,
         padding = padding,
         background = background,
@@ -143,6 +149,7 @@ fun UiBuilder.FlexColumn(
 }
 
 fun UiBuilder.Column(
+    id: String = "",
     width: Size = MaxAvailable,
     height: Size = MaxAvailable,
     minWidth: Size = width,
@@ -157,6 +164,7 @@ fun UiBuilder.Column(
     builder: UiBuilder.() -> Unit
 ) = addContainer(builder) {
     ColumnContainer(
+        id,
         it,
         padding = padding,
         background = background,
@@ -175,6 +183,7 @@ fun UiBuilder.Column(
 }
 
 fun UiBuilder.Box(
+    id: String = "",
     width: Size = MaxAvailable,
     height: Size = MaxAvailable,
     minWidth: Size = width,
@@ -188,6 +197,7 @@ fun UiBuilder.Box(
     builder: UiBuilder.() -> Unit
 ) = addContainer(builder) {
     BoxContainer(
+        id,
         it,
         padding = padding,
         background = background,
@@ -205,6 +215,7 @@ fun UiBuilder.Box(
 }
 
 fun UiBuilder.Rectangle(
+    id: String = "",
     color: Color,
     width: Size = MaxAvailable,
     height: Size = MaxAvailable,
@@ -214,6 +225,7 @@ fun UiBuilder.Rectangle(
     maxHeight: Size = height,
 ) = addElement {
     RectangleElement(
+        id,
         it,
         color = color,
         size = SizeConstraints(
@@ -230,8 +242,10 @@ fun UiBuilder.Rectangle(
 fun UiBuilder.Text(
     text: String,
     style: TextStyle,
+    id: String = "",
 ) = addElement {
     TextLineElement(
+        id,
         it,
         text = text,
         style = style,
@@ -239,6 +253,7 @@ fun UiBuilder.Text(
 }
 
 fun UiBuilder.TextContainer(
+    id: String = "",
     background: Color? = null,
     padding: PaddingValues = PaddingValues.ZERO,
     horizontalAlignment: Alignment = StartAlignment,
@@ -253,6 +268,7 @@ fun UiBuilder.TextContainer(
     builder: UiBuilder.() -> Unit
 ) = addContainer(builder) {
     TextContainer(
+        id,
         it,
         background = background,
         padding = padding,

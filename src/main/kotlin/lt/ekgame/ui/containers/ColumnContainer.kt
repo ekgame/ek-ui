@@ -5,6 +5,7 @@ import lt.ekgame.ui.constraints.*
 import java.awt.Color
 
 open class ColumnContainer(
+    id: String = "",
     parent: Element?,
     size: SizeConstraints = SizeConstraints.DEFAULT,
     padding: PaddingValues = PaddingValues.ZERO,
@@ -12,7 +13,7 @@ open class ColumnContainer(
     val gap: Float = 0f,
     val horizontalAlignment: Alignment = StartAlignment,
     val verticalAlignment: Alignment = StartAlignment,
-) : GenericContainer(parent, size, padding, background) {
+) : GenericContainer(id, parent, size, padding, background) {
 
     override val verticalFractionalSpace = object : FractionalSpace {
         override val totalFraction: Float

@@ -6,6 +6,7 @@ import lt.ekgame.ui.containers.helpers.FlexPlacementHelper
 import java.awt.Color
 
 open class FlexRowContainer(
+    id: String = "",
     parent: Element?,
     size: SizeConstraints = SizeConstraints.DEFAULT,
     padding: PaddingValues = PaddingValues.ZERO,
@@ -14,7 +15,7 @@ open class FlexRowContainer(
     val horizontalAlignment: Alignment = StartAlignment,
     val verticalAlignment: Alignment = StartAlignment,
     val verticalContainerAlignment: Alignment = StartAlignment,
-) : GenericContainer(parent, size, padding, background) {
+) : GenericContainer(id, parent, size, padding, background) {
 
     private fun getTotalGapSize(): Float = (children.size - 1).coerceAtLeast(0)*gap
 

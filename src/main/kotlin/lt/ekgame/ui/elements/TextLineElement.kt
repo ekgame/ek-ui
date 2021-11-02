@@ -7,11 +7,12 @@ import lt.ekgame.ui.constraints.SizeConstraints
 import lt.ekgame.ui.text.*
 
 class TextLineElement(
-    override val parent: Element?,
+    id: String = "",
+    parent: Element?,
     val text: String,
     val style: TextStyle,
     var proxyFor: TextLineElement? = null,
-) : AbstractElement(parent, SizeConstraints.CONTENT) {
+) : AbstractElement(id, parent, SizeConstraints.CONTENT) {
 
     val tokenized by lazy { TextTokenizer(text).tokenize() }
 
@@ -30,9 +31,9 @@ class TextLineElement(
             val headElement = if (head === null) {
                 null
             } else {
-                TextLineElement(parent, head.trimEnd(), style, proxyFor ?: this)
+                TextLineElement(id, parent, head.trimEnd(), style, proxyFor ?: this)
             }
-            val tailElement = TextLineElement(parent, tail.trimStart(), style, proxyFor ?: this)
+            val tailElement = TextLineElement(id, parent, tail.trimStart(), style, proxyFor ?: this)
             return headElement to tailElement
         }
 
