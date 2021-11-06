@@ -77,7 +77,10 @@ class TextTokenizer(val text: String) {
     }
 }
 
-sealed class TextToken
+sealed class TextToken {
+    val isWhitespace: Boolean
+        get() = this is SeparatorToken || this is NewLineToken
+}
 class WordToken(val word: String) : TextToken()
 class SeparatorToken(val separator: String) : TextToken()
 object NewLineToken : TextToken()
@@ -89,3 +92,18 @@ fun Collection<TextToken>.join() = this.map {
             is WordToken -> it.word
         }
     }.joinToString("")
+
+fun Collection<TextToken>.trimEnd(): Collection<TextToken> {
+    val list = ArrayDeque(this)
+
+    while (true) {
+        val last = list.lastOrNull() ?: break
+        if (last.isWhitespace) {
+            list.removeLast()
+        } else {
+            break
+        }
+    }
+
+    return list
+}

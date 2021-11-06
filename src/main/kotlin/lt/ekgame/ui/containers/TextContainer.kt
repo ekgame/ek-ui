@@ -7,6 +7,8 @@ import lt.ekgame.ui.asPlaceables
 import lt.ekgame.ui.constraints.*
 import lt.ekgame.ui.containers.helpers.FlexPlacementHelper
 import lt.ekgame.ui.elements.TextLineElement
+import lt.ekgame.ui.text.SplitResult
+import lt.ekgame.ui.text.WrappingElement
 import java.awt.Color
 
 class TextContainer(
@@ -35,6 +37,12 @@ class TextContainer(
         val flexHelper = FlexPlacementHelper()
         val queue = ArrayDeque(elements)
 
+        fun addFlexChild(element: Element) {
+            element.measure(this)
+            flexHelper.add(element.placeable)
+            flexChildren.add(element)
+        }
+
         while (queue.isNotEmpty()) {
             val placeable = queue.removeFirst()
             val currentBucketWidth = flexHelper.getCurrentBucketWidth()
@@ -42,58 +50,41 @@ class TextContainer(
 
             val element = placeable.element
             if (element !is TextLineElement && currentBucketWidth + childWidth < getInnerWidth()) {
-                flexHelper.add(placeable)
-                flexChildren.add(placeable.element)
+                addFlexChild(element)
                 continue
             }
 
             // The element does not fit into the container, so we have to process it further
             if (element !is TextLineElement) {
                 flexHelper.addBucket()
-                flexHelper.add(placeable)
-                flexChildren.add(placeable.element)
+                addFlexChild(element)
                 continue
             }
 
             val remainingSpace = getInnerWidth() - currentBucketWidth
-            val (head, tail) = element.splitToWidth(remainingSpace)
-            if (head == null) {
-                flexHelper.addBucket()
-                if (tail != null) {
-                    queue.addFirst(tail.placeable)
-                }
-                continue
-            }
 
-            head.measure(this)
-            if (tail == null) {
-                val (head2, tail2) = element.splitToWidth(getInnerWidth(), true)
-
-                if (head2 == null) {
-                    flexHelper.addBucket()
-                    if (tail2 != null) {
-                        queue.addFirst(tail2.placeable)
-                    }
-                } else if (tail2 == null) {
-                    head2.measure(this)
-                    flexHelper.addBucket()
-                    flexHelper.add(head2.placeable)
-                    flexChildren.add(head2)
-                } else {
-                    head2.measure(this)
-                    flexHelper.addBucket()
-                    flexHelper.add(head2.placeable)
-                    flexChildren.add(head2)
-                    flexHelper.addBucket()
-                    tail2.measure(this)
-                    queue.addFirst(tail2.placeable)
+            when (val result = element.applySplit(remainingSpace, getInnerWidth())) {
+                is SplitResult.Failed -> {
+                    // Can only fail if the string is empty, do nothing
                 }
-            } else {
-                flexHelper.add(head.placeable)
-                flexChildren.add(head)
-                flexHelper.addBucket()
-                tail.measure(this)
-                queue.addFirst(tail.placeable)
+                is SplitResult.FitsCompletely -> {
+                    addFlexChild(result.element)
+                }
+                is SplitResult.NewLine -> {
+                    flexHelper.addBucket()
+                    queue.addFirst(result.remainder.placeable)
+                }
+                is SplitResult.TakeNextLine -> {
+                    flexHelper.addBucket()
+                    addFlexChild(result.newLine)
+                    flexHelper.addBucket()
+                    queue.addFirst(result.remainder.placeable)
+                }
+                is SplitResult.Wrap -> {
+                    addFlexChild(result.fittingPart)
+                    flexHelper.addBucket()
+                    queue.addFirst(result.remainder.placeable)
+                }
             }
         }
 

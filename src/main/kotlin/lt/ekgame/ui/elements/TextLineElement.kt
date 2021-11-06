@@ -12,9 +12,11 @@ class TextLineElement(
     val text: String,
     val style: TextStyle,
     var proxyFor: TextLineElement? = null,
-) : AbstractElement(id, parent, SizeConstraints.CONTENT) {
+) : AbstractElement(id, parent, SizeConstraints.CONTENT), WrappingElement<TextLineElement> {
 
-    val tokenized by lazy { TextTokenizer(text).tokenize() }
+    val tokenized by lazy {
+        TextTokenizer(text).tokenize()
+    }
 
     override fun computeWidth(container: Container?, constraint: Size): Float {
         return style.computedFont.measureWidth(text, style)
@@ -26,67 +28,79 @@ class TextLineElement(
 
     private fun measureString(string: String): Float = style.computedFont.measureWidth(string, style)
 
-    fun splitToWidth(width: Float, allowBreakingIndividualWords: Boolean = false): Pair<TextLineElement?, TextLineElement?> {
-        fun createPair(head: String?, tail: String): Pair<TextLineElement?, TextLineElement?> {
-            val headElement = if (head === null) {
-                null
-            } else {
-                TextLineElement(id, parent, head.trimEnd(), style, proxyFor ?: this)
-            }
-            val tailElement = TextLineElement(id, parent, tail.trimStart(), style, proxyFor ?: this)
-            return headElement to tailElement
-        }
+    private fun cloneWithNewText(newText: String) = TextLineElement(id, parent, newText, style, proxyFor ?: this)
 
+    override fun applySplit(remainingWidth: Float, maxWidth: Float): SplitResult<TextLineElement> {
         val tokens = ArrayDeque(tokenized)
-        if (tokens.size == 0 || tokens.size == 1 && !allowBreakingIndividualWords) {
-            // Can't split the element any further
-            return this to null
+
+        if (tokens.isEmpty()) {
+            return SplitResult.Failed()
         }
 
         val firstToken = tokens.first()
+
         if (firstToken is NewLineToken) {
-            return createPair("", tokens.join())
+            tokens.removeFirst()
+            return SplitResult.NewLine(cloneWithNewText(tokens.join()))
         }
 
-        if (firstToken is WordToken && allowBreakingIndividualWords && measureString(firstToken.word) > width) {
-            tokens.removeFirst()
-            val (wordHead, wordTail) = splitWord(width, firstToken.word)
-            return if (wordTail != null) {
-                createPair(wordHead, wordTail + tokens.join())
-            } else {
-                createPair(wordHead, tokens.join())
+        if (firstToken is WordToken) {
+            // If we cant fit the first word in the remaining space, but there would be enough space
+            // in the next line - just move to the next line.
+            val firstWordWidth = measureString(firstToken.word)
+            if (firstWordWidth > remainingWidth && firstWordWidth < maxWidth) {
+                return SplitResult.NewLine(this)
+            }
+
+            // If the first word can not fit into the full width of the container - split the word
+            if (firstWordWidth > maxWidth) {
+                tokens.removeFirst()
+                val (wordHead, potentialWordTail) = splitWord(maxWidth, firstToken.word)
+                val wordTail = potentialWordTail ?: ""
+                return SplitResult.TakeNextLine(
+                    newLine = cloneWithNewText(wordHead.trimEnd()),
+                    remainder = cloneWithNewText(wordTail + tokens.join()),
+                )
             }
         }
 
+        // Calculate how many tokens we can fit into the remaining space
         val fittingTokens = mutableListOf<TextToken>()
         while (tokens.isNotEmpty()) {
             val currentToken = tokens.removeFirst()
             if (currentToken is NewLineToken) {
-                return createPair(fittingTokens.join(), tokens.join().trimStart())
+                // If there is a new line token in the middle of the text - wrap no tnext line right there
+                return SplitResult.Wrap(
+                    fittingPart = cloneWithNewText(fittingTokens.join().trimEnd()),
+                    remainder = cloneWithNewText(tokens.join()),
+                )
             }
 
             val currentText = (fittingTokens + currentToken).join()
             val currentWidth = measureString(currentText)
 
-            if (currentWidth > width) {
-                if (fittingTokens.isEmpty()) {
-                    // Can't fit any elements to the supplied width
-                    return this to null
-                }
+            if (currentWidth > remainingWidth) {
+                val fittingText = fittingTokens.join().trimEnd()
                 if (currentToken !is SeparatorToken) {
                     tokens.addFirst(currentToken)
                 }
-                return createPair(fittingTokens.join(), tokens.join())
+                return if (fittingText.isEmpty()) {
+                    SplitResult.NewLine(cloneWithNewText(tokens.join()))
+                } else {
+                    SplitResult.Wrap(
+                        fittingPart = cloneWithNewText(fittingTokens.join().trimEnd()),
+                        remainder = cloneWithNewText(tokens.join()),
+                    )
+                }
             } else {
                 fittingTokens.add(currentToken)
             }
         }
 
-        // Failed to split
-        return this to null
+        return SplitResult.FitsCompletely(this)
     }
 
-    fun splitWord(width: Float, word: String): Pair<String, String?> {
+    private fun splitWord(width: Float, word: String): Pair<String, String?> {
         var size = 1
         while (size < word.length && measureString(word.substring(0, size)) < width) {
             size++
