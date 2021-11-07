@@ -13,7 +13,7 @@ import java.awt.Color
 
 class TextContainer(
     id: String = "",
-    parent: Element?,
+    parent: Container?,
     size: SizeConstraints = SizeConstraints.CONTENT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,

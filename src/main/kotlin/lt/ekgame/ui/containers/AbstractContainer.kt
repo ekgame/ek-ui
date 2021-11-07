@@ -8,11 +8,13 @@ import lt.ekgame.ui.Placeable
 import lt.ekgame.ui.constraints.ContentSize
 import lt.ekgame.ui.constraints.PaddingValues
 import lt.ekgame.ui.constraints.SizeConstraints
+import lt.ekgame.ui.elements.CompositeElement
+import lt.ekgame.ui.events.Event
 import processing.core.PApplet
 
 abstract class AbstractContainer(
     id: String = "",
-    override val parent: Element? = null,
+    override val parent: Container? = null,
     override val size: SizeConstraints = SizeConstraints.DEFAULT,
     override val padding: PaddingValues = PaddingValues.ZERO,
 ) : AbstractElement(id, parent, size), Container {
@@ -29,6 +31,13 @@ abstract class AbstractContainer(
     protected fun getTotalChildWidth() = children.mapNotNull { it.placeable.width }.sum()
 
     protected fun getTotalChildHeight() = children.mapNotNull { it.placeable.height }.sum()
+
+    override fun onEvent(event: Event) {
+        this.computedChildren.asReversed().forEach {
+            it.onEvent(event)
+        }
+        super.onEvent(event)
+    }
 
     protected fun getRemeasuredChildren(container: Container?): List<Placeable> = children
         .asSequence()
@@ -56,6 +65,9 @@ abstract class AbstractContainer(
 
     override fun addChild(element: Element) {
         children.add(element)
+        if (element is CompositeElement) {
+            element.initComposite()
+        }
     }
 
     override fun removeChild(element: Element) {

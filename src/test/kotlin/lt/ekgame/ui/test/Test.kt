@@ -1,14 +1,22 @@
 package lt.ekgame.ui.test
 
+import lt.ekgame.ui.Container
+import lt.ekgame.ui.Element
 import lt.ekgame.ui.builder.*
 import lt.ekgame.ui.constraints.*
+import lt.ekgame.ui.containers.BoxContainer
 import lt.ekgame.ui.containers.RootContainer
+import lt.ekgame.ui.dump
+import lt.ekgame.ui.elements.CompositeElement
+import lt.ekgame.ui.elements.composeElement
+import lt.ekgame.ui.events.Event
+import lt.ekgame.ui.listen
 import lt.ekgame.ui.text.Font
 import lt.ekgame.ui.text.TextStyle
 import processing.core.PApplet
+import processing.core.PConstants
 import java.awt.Color
 import kotlin.math.roundToInt
-import kotlin.random.Random
 
 class UiTest : PApplet() {
 
@@ -176,6 +184,13 @@ class UiTest : PApplet() {
         }
     }
 
+    fun UiBuilder.Button(
+        text: String,
+        onClick: (MouseClickedEvent) -> Unit = {}
+    ) = addElement {
+        ButtonElement(it, text, font, onClick)
+    }
+
     /**
      * Build a UI only using builders.
      */
@@ -183,17 +198,19 @@ class UiTest : PApplet() {
         Box(
             background = Color.white,
             padding = PaddingValues.of(10f),
-            height = ContentSize,
         ) {
-            TextContainer(
-                verticalAlignment = EndAlignment
+            Column(
+                gap = 10f,
             ) {
-                Text("sdf sdf sdfd!\n", style = TextStyle(font, bold = true, underline = false, size = 32f))
-                Text("sdf sdf sdfd sfsd fsdf!\n", style = TextStyle(font, bold = true, underline = true, size = 32f))
-                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf!\n", style = TextStyle(font, bold = true, underline = false, size = 32f))
-                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf sdf sdf sdfd!\n", style = TextStyle(font, bold = true, underline = true, size = 32f))
-                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf sdf sdf sdfd sfsd fsdf!\n", style = TextStyle(font, bold = true, underline = false, size = 32f))
-                Text("sdf sdf sdfd sfsd fsdf ds fsd fds fsdf sdf sdf sdfd sfsd fsdf ds fsd fds fsdf!\n", style = TextStyle(font, bold = true, underline = true, size = 32f))
+                Button("First").listen<MouseClickedEvent> {
+                    println("First got click event")
+                }
+                Button("Second").listen<MouseClickedEvent> {
+                    println("Second got click event")
+                }
+                Button("Third").listen<MouseClickedEvent> {
+                    println("Third got click event")
+                }
             }
         }
     }
@@ -205,7 +222,22 @@ class UiTest : PApplet() {
         super.setup()
         font = buildFont(this, "Arial")
         surface.setResizable(true)
-        root = buildTestUi()
+        root = buildTestUi2()
+        println(root.dump())
+    }
+
+    override fun mouseMoved(event: processing.event.MouseEvent) {
+        root.onEvent(MouseMoveEvent(event.x.toFloat(), event.y.toFloat()))
+    }
+
+    override fun mouseClicked(event: processing.event.MouseEvent) {
+        val button = when (event.button) {
+            PConstants.LEFT -> MouseButton.LEFT
+            PConstants.RIGHT -> MouseButton.RIGHT
+            PConstants.CENTER -> MouseButton.MIDDLE
+            else -> error("Invalid mouse button: ${event.button}")
+        }
+        root.onEvent(MouseClickedEvent(event.x.toFloat(), event.y.toFloat(), button))
     }
 
     override fun draw() {
@@ -234,6 +266,44 @@ class UiTest : PApplet() {
         }
     }
 }
+
+class ButtonElement(
+    parent: Container,
+    val text: String,
+    val font: Font,
+    val onClick: (MouseClickedEvent) -> Unit = {},
+) : CompositeElement(parent, SizeConstraints.CONTENT) {
+    override fun load() = composeElement {
+        Box(
+            background = Color.BLACK,
+            padding = PaddingValues.of(10f, 20f),
+            width = ContentSize,
+            height = ContentSize,
+        ) {
+            Text(text, TextStyle(font, color = Color.WHITE))
+        }
+    }
+}
+
+open class MouseEvent(
+    val x: Float,
+    val y: Float,
+) : Event
+
+class MouseMoveEvent(
+    x: Float,
+    y: Float,
+) : MouseEvent(x, y)
+
+enum class MouseButton {
+    LEFT, RIGHT, MIDDLE
+}
+
+class MouseClickedEvent(
+    x: Float,
+    y: Float,
+    val button: MouseButton,
+) : MouseEvent(x, y)
 
 fun main(args: Array<String>) {
     UiTest.run(args)

@@ -6,7 +6,7 @@ import java.awt.Color
 
 open class ColumnContainer(
     id: String = "",
-    parent: Element?,
+    parent: Container?,
     size: SizeConstraints = SizeConstraints.DEFAULT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,

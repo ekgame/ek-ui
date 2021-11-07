@@ -2,7 +2,9 @@ package lt.ekgame.ui
 
 import lt.ekgame.ui.constraints.PaddingValues
 import lt.ekgame.ui.constraints.SizeConstraints
-import processing.core.PApplet
+import lt.ekgame.ui.events.Event
+import lt.ekgame.ui.events.EventListener
+import kotlin.reflect.KClass
 
 interface Placeable {
     val element: Element
@@ -29,11 +31,22 @@ interface Placeable {
 
 interface Element {
     val id: String
-    val parent: Element?
+    val parent: Container?
     val size: SizeConstraints
     val placeable: Placeable
 
     fun measure(container: Container?): Boolean
+
+    fun onEvent(event: Event)
+    fun <T : Event>listen(clazz: KClass<T>, listener: EventListener<Event>)
+}
+
+inline fun <reified T : Event> Element.listen(crossinline callback: (T) -> Unit) {
+    listen(T::class, object : EventListener<Event> {
+        override fun callback(event: Event) {
+            callback.invoke(event as T)
+        }
+    })
 }
 
 interface Container : Element {

@@ -2,14 +2,38 @@ package lt.ekgame.ui.elements
 
 import lt.ekgame.ui.*
 import lt.ekgame.ui.constraints.*
+import lt.ekgame.ui.events.Event
+import lt.ekgame.ui.events.EventListener
+import kotlin.reflect.KClass
 
 abstract class AbstractElement(
     override val id: String,
-    override val parent: Element?,
+    override val parent: Container?,
     override val size: SizeConstraints = SizeConstraints.DEFAULT,
 ) : Element {
 
     override val placeable: Placeable by lazy { BasicPlaceable(this) }
+
+    private val listeners = mutableMapOf<KClass<*>, MutableList<EventListener<Event>>>()
+
+    override fun <T : Event> listen(clazz: KClass<T>, listener: EventListener<Event>) {
+        listeners
+            .getOrPut(clazz) { mutableListOf() }
+            .add(listener as EventListener<Event>)
+    }
+
+    override fun onEvent(event: Event) {
+        listeners.asSequence()
+            .filter {
+                it.key.isInstance(event)
+            }
+            .flatMap {
+                it.value
+            }
+            .forEach {
+                it.callback(event)
+            }
+    }
 
     override fun measure(container: Container?): Boolean {
         if (container == null) {

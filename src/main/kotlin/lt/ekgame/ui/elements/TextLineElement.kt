@@ -8,7 +8,7 @@ import lt.ekgame.ui.text.*
 
 class TextLineElement(
     id: String = "",
-    parent: Element?,
+    parent: Container?,
     val text: String,
     val style: TextStyle,
     var proxyFor: TextLineElement? = null,
