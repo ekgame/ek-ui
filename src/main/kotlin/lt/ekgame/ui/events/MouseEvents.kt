@@ -25,8 +25,9 @@ abstract class MouseEvent(
 class MouseMoveEvent(
     global: Point,
     position: Point = global,
+    override val parent: Event? = null,
 ) : MouseEvent(global, position) {
-    override fun forPosition(position: Point) = MouseMoveEvent(global, position)
+    override fun forPosition(position: Point) = MouseMoveEvent(global, position, this)
 }
 
 enum class MouseButton {
@@ -37,6 +38,7 @@ class MouseClickedEvent(
     global: Point,
     position: Point = global,
     val button: MouseButton,
+    override val parent: Event? = null,
 ) : MouseEvent(global, position) {
-    override fun forPosition(position: Point) = MouseClickedEvent(global, position, button)
+    override fun forPosition(position: Point) = MouseClickedEvent(global, position, button, this)
 }

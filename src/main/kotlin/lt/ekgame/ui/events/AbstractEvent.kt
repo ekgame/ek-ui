@@ -6,5 +6,6 @@ abstract class AbstractEvent : Event {
 
     override fun stopPropagation() {
         isPropagating = false
+        parent?.stopPropagation()
     }
 }
