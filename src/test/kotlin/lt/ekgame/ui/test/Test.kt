@@ -200,26 +200,17 @@ class UiTest : PApplet() {
             background = Color.white,
             padding = PaddingValues.of(10f),
         ) {
-            Row(
-                gap = 10f,
-            ) {
-                Column(gap = 10f) {
-                    Button("First") {
-                        println("First: $it")
-                    }
-                    Button("Second") {
-                        println("Second: $it")
-                    }
-                }
-
-                Column(gap = 10f) {
-                    Button("Third") {
-                        println("Third: $it")
-                    }
-                    Button("Forth") {
-                        println("Forth: $it")
-                    }
-                }
+            Button("aaaaaaaaaaaaaaaaaaaaaaaa") {
+                println("aaaaaaaaaaaaaaaaaaaaaaaa: $it")
+            }
+            Button("aaaaaaaaaaaaaaaaaa") {
+                println("aaaaaaaaaaaaaaaaaa: $it")
+            }
+            Button("aaaaaaaaaaaa") {
+                println("aaaaaaaaaaaa: $it")
+            }
+            Button("aaaaaa") {
+                println("aaaaaa: $it")
             }
         }
     }
@@ -282,6 +273,7 @@ class ButtonElement(
     val font: Font,
     val onClick: (MouseClickedEvent) -> Unit = {}
 ) : CompositeElement(parent, SizeConstraints.CONTENT) {
+
     override fun load() = composeElement {
         val container = Box(
             background = Color.BLACK,
@@ -289,7 +281,16 @@ class ButtonElement(
             width = ContentSize,
             height = ContentSize,
         ) {
-            Text(text, TextStyle(font, color = Color.WHITE))
+            val textElement = Text(text, TextStyle(font, color = Color.WHITE))
+        }
+
+        container.listen<MouseMoveEvent> {
+            if (it.isPropagating && container.placeable.fits(it.position)) {
+                it.stopPropagation()
+                container.background = Color.GRAY
+            } else {
+                container.background = Color.BLACK
+            }
         }
 
         container.listen<MouseClickedEvent> {
