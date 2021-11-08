@@ -10,16 +10,16 @@ import java.awt.Color
 import java.awt.event.TextEvent
 
 class UiBuilder(private val container: Container) {
-    fun addElement(factory: (parent: Container) -> Element): Element {
+    fun <T : Element> addElement(factory: (parent: Container) -> T): T {
         val subElement = factory.invoke(container)
         container.addChild(subElement)
         return subElement
     }
 
-    fun addContainer(
+    fun <T : Container> addContainer(
         builder: UiBuilder.() -> Unit,
-        factory: (parent: Container) -> Container
-    ): Container {
+        factory: (parent: Container) -> T
+    ): T {
         val targetContainer = factory.invoke(container)
         val instance = UiBuilder(targetContainer)
         builder.invoke(instance)

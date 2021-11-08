@@ -34,7 +34,7 @@ abstract class AbstractContainer(
 
     override fun propagateEvent(event: Event) {
         val contextualEvent = event.forContext(this)
-        computedChildren.firstOrNull {
+        computedChildren.reversed().firstOrNull {
             it.propagateEvent(contextualEvent)
             !event.isPropagating
         }

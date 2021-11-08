@@ -9,11 +9,11 @@ import lt.ekgame.ui.containers.RootContainer
 import lt.ekgame.ui.dump
 import lt.ekgame.ui.elements.CompositeElement
 import lt.ekgame.ui.elements.composeElement
-import lt.ekgame.ui.events.AbstractEvent
-import lt.ekgame.ui.events.Event
+import lt.ekgame.ui.events.*
 import lt.ekgame.ui.listen
 import lt.ekgame.ui.text.Font
 import lt.ekgame.ui.text.TextStyle
+import lt.ekgame.ui.units.Point
 import processing.core.PApplet
 import processing.core.PConstants
 import java.awt.Color
@@ -203,37 +203,24 @@ class UiTest : PApplet() {
             Row(
                 gap = 10f,
             ) {
-                Column(
-                    gap = 10f,
-                ) {
-                    Box {
-                        Button("First").listen<MouseClickedEvent> {
-                            println("First: $it")
-                        }
+                Column(gap = 10f) {
+                    Button("First") {
+                        println("First: $it")
                     }
-                    Box {
-                        Button("Second").listen<MouseClickedEvent> {
-                            println("Second: $it")
-                        }
+                    Button("Second") {
+                        println("Second: $it")
                     }
                 }
 
-                Column(
-                    gap = 10f,
-                ) {
-                    Box {
-                        Button("Third").listen<MouseClickedEvent> {
-                            println("Third: $it")
-                        }
+                Column(gap = 10f) {
+                    Button("Third") {
+                        println("Third: $it")
                     }
-                    Box {
-                        Button("Forth").listen<MouseClickedEvent> {
-                            println("Forth: $it")
-                        }
+                    Button("Forth") {
+                        println("Forth: $it")
                     }
                 }
             }
-
         }
     }
 
@@ -296,7 +283,7 @@ class ButtonElement(
     val onClick: (MouseClickedEvent) -> Unit = {}
 ) : CompositeElement(parent, SizeConstraints.CONTENT) {
     override fun load() = composeElement {
-        Box(
+        val container = Box(
             background = Color.BLACK,
             padding = PaddingValues.of(10f, 20f),
             width = ContentSize,
@@ -304,49 +291,16 @@ class ButtonElement(
         ) {
             Text(text, TextStyle(font, color = Color.WHITE))
         }
-    }
-}
 
-data class Point(val x: Float, val y: Float) {
-    fun add(x: Float, y: Float) = Point(this.x + x, this.y + y)
-    fun subtract(x: Float, y: Float) = Point(this.x - x, this.y - y)
-}
-
-abstract class MouseEvent(
-    val global: Point,
-    val position: Point = global,
-) : AbstractEvent() {
-    abstract fun forPosition(position: Point): MouseEvent
-
-    override fun forContext(element: Element): Event {
-        if (element is Container && element.placeable.x != null && element.placeable.y != null) {
-            return forPosition(position.subtract(element.placeable.x!!, element.placeable.y!!))
+        container.listen<MouseClickedEvent> {
+            if (container.placeable.fits(it.position)) {
+                it.stopPropagation()
+                onClick.invoke(it)
+            }
         }
-        return this
+
+        container
     }
-
-    override fun toString(): String {
-        return "${this::class.simpleName ?: ""}[${position.x.toInt()},${position.y.toInt()}]"
-    }
-}
-
-class MouseMoveEvent(
-    global: Point,
-    position: Point = global,
-) : MouseEvent(global, position) {
-    override fun forPosition(position: Point) = MouseMoveEvent(global, position)
-}
-
-enum class MouseButton {
-    LEFT, RIGHT, MIDDLE
-}
-
-class MouseClickedEvent(
-    global: Point,
-    position: Point = global,
-    val button: MouseButton,
-) : MouseEvent(global, position) {
-    override fun forPosition(position: Point) = MouseClickedEvent(global, position, button)
 }
 
 fun main(args: Array<String>) {
