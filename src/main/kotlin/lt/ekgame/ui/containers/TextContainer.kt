@@ -17,11 +17,11 @@ class TextContainer(
     size: SizeConstraints = SizeConstraints.CONTENT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,
-    val justified: Boolean = false,
+    var justified: Boolean = false,
     /** The space between lines */
-    val tracking: Float = 4f,
-    val horizontalAlignment: Alignment = StartAlignment,
-    val verticalAlignment: Alignment = StartAlignment,
+    var tracking: Float = 4f,
+    var horizontalAlignment: Alignment = StartAlignment,
+    var verticalAlignment: Alignment = StartAlignment,
 ) : GenericContainer(id, parent, size, padding, background) {
 
     private val flexChildren = mutableListOf<Element>()

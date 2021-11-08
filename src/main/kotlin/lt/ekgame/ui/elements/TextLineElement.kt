@@ -9,9 +9,9 @@ import lt.ekgame.ui.text.*
 class TextLineElement(
     id: String = "",
     parent: Container?,
-    val text: String,
-    val style: TextStyle,
-    var proxyFor: TextLineElement? = null,
+    var text: String,
+    var style: TextStyle,
+    val proxyFor: TextLineElement? = null,
 ) : AbstractElement(id, parent, SizeConstraints.CONTENT), WrappingElement<TextLineElement> {
 
     val tokenized by lazy {

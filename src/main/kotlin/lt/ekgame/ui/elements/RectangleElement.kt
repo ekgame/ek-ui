@@ -8,6 +8,6 @@ import java.awt.Color
 class RectangleElement(
     id: String = "",
     override val parent: Container?,
-    val color: Color,
-    override val size: SizeConstraints = SizeConstraints.DEFAULT,
+    var color: Color,
+    size: SizeConstraints = SizeConstraints.DEFAULT,
 ) : AbstractElement(id, parent, size)

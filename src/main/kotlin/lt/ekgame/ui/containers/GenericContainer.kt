@@ -10,5 +10,5 @@ open class GenericContainer(
     parent: Container?,
     size: SizeConstraints = SizeConstraints.DEFAULT,
     padding: PaddingValues = PaddingValues.ZERO,
-    val background: Color? = null,
+    var background: Color? = null,
 ) : AbstractContainer(id, parent, size, padding)

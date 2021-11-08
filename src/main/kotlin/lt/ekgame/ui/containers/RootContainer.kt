@@ -31,23 +31,24 @@ class RootContainer(
             set(value) = error("Unsupported operation setHeight for RootContainer")
     }
 
-    override val size: SizeConstraints = object : SizeConstraints() {
-        override val width: Size
-            get() = AbsoluteSize(this@RootContainer.width)
+    override var size: SizeConstraints = object : SizeConstraints() {
+            override val width: Size
+                get() = AbsoluteSize(this@RootContainer.width)
 
-        override val height: Size
-            get() = AbsoluteSize(this@RootContainer.height)
+            override val height: Size
+                get() = AbsoluteSize(this@RootContainer.height)
 
-        override val minWidth: Size
-            get() = width
+            override val minWidth: Size
+                get() = width
 
-        override val minHeight: Size
-            get() = height
+            override val minHeight: Size
+                get() = height
 
-        override val maxWidth: Size
-            get() = width
+            override val maxWidth: Size
+                get() = width
 
-        override val maxHeight: Size
-            get() = height
-    }
+            override val maxHeight: Size
+                get() = height
+        }
+        set(value) {}
 }

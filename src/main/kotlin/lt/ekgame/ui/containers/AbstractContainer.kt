@@ -15,8 +15,8 @@ import processing.core.PApplet
 abstract class AbstractContainer(
     id: String = "",
     override val parent: Container? = null,
-    override val size: SizeConstraints = SizeConstraints.DEFAULT,
-    override val padding: PaddingValues = PaddingValues.ZERO,
+    override var size: SizeConstraints = SizeConstraints.DEFAULT,
+    override var padding: PaddingValues = PaddingValues.ZERO,
 ) : AbstractElement(id, parent, size), Container {
     override val children: MutableList<Element> = mutableListOf()
 

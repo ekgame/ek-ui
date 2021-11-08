@@ -12,8 +12,8 @@ open class BoxContainer(
     size: SizeConstraints = SizeConstraints.DEFAULT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,
-    val verticalAlignment: Alignment = StartAlignment,
-    val horizontalAlignment: Alignment = StartAlignment,
+    var verticalAlignment: Alignment = StartAlignment,
+    var horizontalAlignment: Alignment = StartAlignment,
 ) : GenericContainer(id, parent, size, padding, background) {
 
     override fun measure(container: Container?): Boolean {

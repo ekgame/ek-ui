@@ -11,10 +11,10 @@ open class FlexRowContainer(
     size: SizeConstraints = SizeConstraints.DEFAULT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,
-    val gap: Float = 0f,
-    val horizontalAlignment: Alignment = StartAlignment,
-    val verticalAlignment: Alignment = StartAlignment,
-    val verticalContainerAlignment: Alignment = StartAlignment,
+    var gap: Float = 0f,
+    var horizontalAlignment: Alignment = StartAlignment,
+    var verticalAlignment: Alignment = StartAlignment,
+    var verticalContainerAlignment: Alignment = StartAlignment,
 ) : GenericContainer(id, parent, size, padding, background) {
 
     private fun getTotalGapSize(): Float = (computedChildren.size - 1).coerceAtLeast(0)*gap
