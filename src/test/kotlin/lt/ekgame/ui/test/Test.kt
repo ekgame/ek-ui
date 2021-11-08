@@ -9,6 +9,7 @@ import lt.ekgame.ui.containers.RootContainer
 import lt.ekgame.ui.dump
 import lt.ekgame.ui.elements.CompositeElement
 import lt.ekgame.ui.elements.composeElement
+import lt.ekgame.ui.events.AbstractEvent
 import lt.ekgame.ui.events.Event
 import lt.ekgame.ui.listen
 import lt.ekgame.ui.text.Font
@@ -199,19 +200,40 @@ class UiTest : PApplet() {
             background = Color.white,
             padding = PaddingValues.of(10f),
         ) {
-            Column(
+            Row(
                 gap = 10f,
             ) {
-                Button("First").listen<MouseClickedEvent> {
-                    println("First got click event")
+                Column(
+                    gap = 10f,
+                ) {
+                    Box {
+                        Button("First").listen<MouseClickedEvent> {
+                            println("First: $it")
+                        }
+                    }
+                    Box {
+                        Button("Second").listen<MouseClickedEvent> {
+                            println("Second: $it")
+                        }
+                    }
                 }
-                Button("Second").listen<MouseClickedEvent> {
-                    println("Second got click event")
-                }
-                Button("Third").listen<MouseClickedEvent> {
-                    println("Third got click event")
+
+                Column(
+                    gap = 10f,
+                ) {
+                    Box {
+                        Button("Third").listen<MouseClickedEvent> {
+                            println("Third: $it")
+                        }
+                    }
+                    Box {
+                        Button("Forth").listen<MouseClickedEvent> {
+                            println("Forth: $it")
+                        }
+                    }
                 }
             }
+
         }
     }
 
@@ -227,7 +249,7 @@ class UiTest : PApplet() {
     }
 
     override fun mouseMoved(event: processing.event.MouseEvent) {
-        root.onEvent(MouseMoveEvent(event.x.toFloat(), event.y.toFloat()))
+        root.propagateEvent(MouseMoveEvent(Point(event.x.toFloat(), event.y.toFloat())))
     }
 
     override fun mouseClicked(event: processing.event.MouseEvent) {
@@ -237,7 +259,7 @@ class UiTest : PApplet() {
             PConstants.CENTER -> MouseButton.MIDDLE
             else -> error("Invalid mouse button: ${event.button}")
         }
-        root.onEvent(MouseClickedEvent(event.x.toFloat(), event.y.toFloat(), button))
+        root.propagateEvent(MouseClickedEvent(Point(event.x.toFloat(), event.y.toFloat()), button = button))
     }
 
     override fun draw() {
@@ -271,7 +293,7 @@ class ButtonElement(
     parent: Container,
     val text: String,
     val font: Font,
-    val onClick: (MouseClickedEvent) -> Unit = {},
+    val onClick: (MouseClickedEvent) -> Unit = {}
 ) : CompositeElement(parent, SizeConstraints.CONTENT) {
     override fun load() = composeElement {
         Box(
@@ -285,25 +307,47 @@ class ButtonElement(
     }
 }
 
-open class MouseEvent(
-    val x: Float,
-    val y: Float,
-) : Event
+data class Point(val x: Float, val y: Float) {
+    fun add(x: Float, y: Float) = Point(this.x + x, this.y + y)
+    fun subtract(x: Float, y: Float) = Point(this.x - x, this.y - y)
+}
+
+abstract class MouseEvent(
+    val global: Point,
+    val position: Point = global,
+) : AbstractEvent() {
+    abstract fun forPosition(position: Point): MouseEvent
+
+    override fun forContext(element: Element): Event {
+        if (element is Container && element.placeable.x != null && element.placeable.y != null) {
+            return forPosition(position.subtract(element.placeable.x!!, element.placeable.y!!))
+        }
+        return this
+    }
+
+    override fun toString(): String {
+        return "${this::class.simpleName ?: ""}[${position.x.toInt()},${position.y.toInt()}]"
+    }
+}
 
 class MouseMoveEvent(
-    x: Float,
-    y: Float,
-) : MouseEvent(x, y)
+    global: Point,
+    position: Point = global,
+) : MouseEvent(global, position) {
+    override fun forPosition(position: Point) = MouseMoveEvent(global, position)
+}
 
 enum class MouseButton {
     LEFT, RIGHT, MIDDLE
 }
 
 class MouseClickedEvent(
-    x: Float,
-    y: Float,
+    global: Point,
+    position: Point = global,
     val button: MouseButton,
-) : MouseEvent(x, y)
+) : MouseEvent(global, position) {
+    override fun forPosition(position: Point) = MouseClickedEvent(global, position, button)
+}
 
 fun main(args: Array<String>) {
     UiTest.run(args)

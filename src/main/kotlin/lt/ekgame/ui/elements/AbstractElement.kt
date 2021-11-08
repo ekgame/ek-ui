@@ -19,21 +19,23 @@ abstract class AbstractElement(
     override fun <T : Event> listen(clazz: KClass<T>, listener: EventListener<Event>) {
         listeners
             .getOrPut(clazz) { mutableListOf() }
-            .add(listener as EventListener<Event>)
+            .add(listener)
     }
 
-    override fun onEvent(event: Event) {
+    override fun propagateEvent(event: Event) {
+        handleEvent(event.forContext(this))
+    }
+
+    fun handleEvent(event: Event) {
         listeners.asSequence()
-            .filter {
-                it.key.isInstance(event)
-            }
-            .flatMap {
-                it.value
-            }
-            .forEach {
+            .filter { it.key.isInstance(event) }
+            .flatMap { it.value }
+            .firstOrNull {
                 it.callback(event)
+                !event.isPropagating
             }
     }
+
 
     override fun measure(container: Container?): Boolean {
         if (container == null) {

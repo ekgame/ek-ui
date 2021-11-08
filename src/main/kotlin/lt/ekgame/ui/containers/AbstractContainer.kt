@@ -32,11 +32,15 @@ abstract class AbstractContainer(
 
     protected fun getTotalChildHeight() = children.mapNotNull { it.placeable.height }.sum()
 
-    override fun onEvent(event: Event) {
-        this.computedChildren.asReversed().forEach {
-            it.onEvent(event)
+    override fun propagateEvent(event: Event) {
+        val contextualEvent = event.forContext(this)
+        computedChildren.firstOrNull {
+            it.propagateEvent(contextualEvent)
+            !event.isPropagating
         }
-        super.onEvent(event)
+        if (contextualEvent.isPropagating) {
+            handleEvent(event)
+        }
     }
 
     protected fun getRemeasuredChildren(container: Container?): List<Placeable> = children
