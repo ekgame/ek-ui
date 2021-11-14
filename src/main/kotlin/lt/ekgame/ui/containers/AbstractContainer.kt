@@ -10,6 +10,7 @@ import lt.ekgame.ui.constraints.PaddingValues
 import lt.ekgame.ui.constraints.SizeConstraints
 import lt.ekgame.ui.elements.CompositeElement
 import lt.ekgame.ui.events.Event
+import lt.ekgame.ui.events.EventDirection
 import processing.core.PApplet
 
 abstract class AbstractContainer(
@@ -33,7 +34,7 @@ abstract class AbstractContainer(
     protected fun getTotalChildHeight() = children.mapNotNull { it.placeable.height }.sum()
 
     override fun propagateEvent(event: Event) {
-        val contextualEvent = event.forContext(this)
+        val contextualEvent = event.forContext(this, EventDirection.UP)
         computedChildren.reversed().firstOrNull {
             it.propagateEvent(contextualEvent)
             !event.isPropagating

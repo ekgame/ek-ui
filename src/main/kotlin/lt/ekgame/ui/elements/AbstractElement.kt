@@ -2,8 +2,9 @@ package lt.ekgame.ui.elements
 
 import lt.ekgame.ui.*
 import lt.ekgame.ui.constraints.*
-import lt.ekgame.ui.events.Event
-import lt.ekgame.ui.events.EventListener
+import lt.ekgame.ui.events.*
+import lt.ekgame.ui.units.Point
+import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
 abstract class AbstractElement(
@@ -16,6 +17,46 @@ abstract class AbstractElement(
 
     private val listeners = mutableMapOf<KClass<*>, MutableList<EventListener<Event>>>()
 
+    private var isMouseHovering by Delegates.observable(false) { _, old, new ->
+        if (old != new) {
+            val event = when (new) {
+                true -> PointerEnteredEvent(this)
+                false -> PointerLeftEvent(this)
+            }
+            propagateEventDownwards(event)
+        }
+    }
+
+    init {
+        listen<InternalMouseMoveEvent> {
+            if (!it.hoverHandled && placeable.fits(it.relativePosition)) {
+                isMouseHovering = true
+                it.setHoverAsHandled()
+            } else {
+                isMouseHovering = it.isChildHovered
+            }
+        }
+
+        listen<PointerEnteredEvent> {
+            if (isMouseHovering && it.target !== this) {
+                it.stopPropagation()
+            }
+        }
+
+        listen<PointerLeftEvent> {
+            if (isMouseHovering) {
+                it.stopPropagation()
+            }
+        }
+
+        listen<InternalMouseClickedEvent> {
+            if (placeable.fits(it.relativePosition)) {
+                it.stopPropagation()
+                propagateEventDownwards(MouseClickedEvent(it.relativePosition, it.screenPosition, it.button))
+            }
+        }
+    }
+
     override fun <T : Event> listen(clazz: KClass<T>, listener: EventListener<Event>) {
         listeners
             .getOrPut(clazz) { mutableListOf() }
@@ -23,10 +64,21 @@ abstract class AbstractElement(
     }
 
     override fun propagateEvent(event: Event) {
-        handleEvent(event.forContext(this))
+        handleEvent(event.forContext(this, EventDirection.UP))
+    }
+
+    override fun propagateEventDownwards(event: Event) {
+        handleEvent(event.forContext(this, EventDirection.DOWN))
+        if (event.isPropagating) {
+            parent?.propagateEventDownwards(event)
+        }
     }
 
     fun handleEvent(event: Event) {
+        if (!event.isPropagating) {
+            return
+        }
+
         listeners.asSequence()
             .filter { it.key.isInstance(event) }
             .flatMap { it.value }
@@ -35,7 +87,6 @@ abstract class AbstractElement(
                 !event.isPropagating
             }
     }
-
 
     override fun measure(container: Container?): Boolean {
         if (container == null) {

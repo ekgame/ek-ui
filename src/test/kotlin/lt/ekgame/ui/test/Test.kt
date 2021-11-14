@@ -1,10 +1,9 @@
 package lt.ekgame.ui.test
 
 import lt.ekgame.ui.Container
-import lt.ekgame.ui.Element
+import lt.ekgame.ui.Debug
 import lt.ekgame.ui.builder.*
 import lt.ekgame.ui.constraints.*
-import lt.ekgame.ui.containers.BoxContainer
 import lt.ekgame.ui.containers.RootContainer
 import lt.ekgame.ui.dump
 import lt.ekgame.ui.elements.CompositeElement
@@ -16,6 +15,7 @@ import lt.ekgame.ui.text.TextStyle
 import lt.ekgame.ui.units.Point
 import processing.core.PApplet
 import processing.core.PConstants
+import processing.event.KeyEvent
 import java.awt.Color
 import kotlin.math.roundToInt
 
@@ -187,9 +187,10 @@ class UiTest : PApplet() {
 
     fun UiBuilder.Button(
         text: String,
+        id: String = "",
         onClick: (MouseClickedEvent) -> Unit = {}
     ) = addElement {
-        ButtonElement(it, text, font, onClick)
+        ButtonElement(id, it, text, font, onClick)
     }
 
     /**
@@ -227,7 +228,7 @@ class UiTest : PApplet() {
     }
 
     override fun mouseMoved(event: processing.event.MouseEvent) {
-        root.propagateEvent(MouseMoveEvent(Point(event.x.toFloat(), event.y.toFloat())))
+        root.propagateEvent(InternalMouseMoveEvent(Point(event.x.toFloat(), event.y.toFloat())))
     }
 
     override fun mouseClicked(event: processing.event.MouseEvent) {
@@ -237,7 +238,19 @@ class UiTest : PApplet() {
             PConstants.CENTER -> MouseButton.MIDDLE
             else -> error("Invalid mouse button: ${event.button}")
         }
-        root.propagateEvent(MouseClickedEvent(Point(event.x.toFloat(), event.y.toFloat()), button = button))
+        root.propagateEvent(InternalMouseClickedEvent(Point(event.x.toFloat(), event.y.toFloat()), button = button))
+    }
+
+    override fun keyPressed(event: KeyEvent) {
+        if (event.key == ' ') {
+            Debug.enabled = true
+        }
+    }
+
+    override fun keyReleased(event: KeyEvent) {
+        if (event.key == ' ') {
+            Debug.enabled = false
+        }
     }
 
     override fun draw() {
@@ -268,35 +281,37 @@ class UiTest : PApplet() {
 }
 
 class ButtonElement(
+    id: String,
     parent: Container,
     val text: String,
     val font: Font,
     val onClick: (MouseClickedEvent) -> Unit = {}
-) : CompositeElement(parent, SizeConstraints.CONTENT) {
+) : CompositeElement(parent, SizeConstraints.CONTENT, id) {
 
     override fun load() = composeElement {
         val container = Box(
+            id = id,
             background = Color.BLACK,
             padding = PaddingValues.of(10f, 20f),
             width = ContentSize,
             height = ContentSize,
         ) {
-            val textElement = Text(text, TextStyle(font, color = Color.WHITE))
+            Text(id.ifEmpty { text }, TextStyle(font, color = Color.WHITE))
         }
 
-        container.listen<MouseMoveEvent> {
-            if (it.isPropagating && container.placeable.fits(it.position)) {
-                it.stopPropagation()
-                container.background = Color.GRAY
-            } else {
-                container.background = Color.BLACK
-            }
+        container.listen<PointerEnteredEvent> {
+            container.background = Color.GRAY
         }
 
-        container.listen<MouseClickedEvent> {
-            if (container.placeable.fits(it.position)) {
-                it.stopPropagation()
-                onClick.invoke(it)
+        container.listen<PointerLeftEvent> {
+            container.background = Color.BLACK
+        }
+
+        container.listen(onClick)
+
+        container.listen<Event> {
+            if (it !is InternalMouseMoveEvent) {
+                println(it)
             }
         }
 

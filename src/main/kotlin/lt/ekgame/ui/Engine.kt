@@ -53,6 +53,7 @@ interface Element {
     fun measure(container: Container?): Boolean
 
     fun propagateEvent(event: Event)
+    fun propagateEventDownwards(event: Event)
     fun <T : Event>listen(clazz: KClass<T>, listener: EventListener<Event>)
 }
 
