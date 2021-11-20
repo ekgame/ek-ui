@@ -5,6 +5,9 @@ import lt.ekgame.ui.Placeable
 import lt.ekgame.ui.builder.UiBuilder
 import lt.ekgame.ui.constraints.SizeConstraints
 import lt.ekgame.ui.containers.AbstractContainer
+import lt.ekgame.ui.events.Event
+import lt.ekgame.ui.events.EventListener
+import kotlin.reflect.KClass
 
 abstract class CompositeElement(
     parent: Container,
@@ -17,10 +20,19 @@ abstract class CompositeElement(
     override val placeable: Placeable
         get() = proxyContainer.placeable
 
-    abstract fun load(): Container
+    abstract fun initComposition(): Container
+
+    open fun initListeners() {}
 
     fun initComposite() {
-        proxyContainer = load()
+        proxyContainer = initComposition()
+        initListeners()
+    }
+
+    override fun <T : Event> listen(clazz: KClass<T>, listener: EventListener<Event>) {
+        if (this::proxyContainer.isInitialized) {
+            proxyContainer.listen(clazz, listener)
+        }
     }
 
     override fun measure(container: Container?): Boolean {
