@@ -5,7 +5,6 @@ import lt.ekgame.ui.Placeable
 import lt.ekgame.ui.constraints.AbsoluteSize
 import lt.ekgame.ui.constraints.Size
 import lt.ekgame.ui.constraints.SizeConstraints
-import processing.core.PApplet
 
 class RootContainer(
     var width: Float = 0f,

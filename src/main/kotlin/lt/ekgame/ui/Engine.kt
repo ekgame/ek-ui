@@ -1,5 +1,6 @@
 package lt.ekgame.ui
 
+import dev.romainguy.kotlin.math.Mat4
 import lt.ekgame.ui.constraints.PaddingValues
 import lt.ekgame.ui.constraints.SizeConstraints
 import lt.ekgame.ui.events.Event
@@ -13,6 +14,9 @@ interface Placeable {
     var y: Float?
     var width: Float?
     var height: Float?
+
+    val isValid: Boolean
+        get() = x != null && y != null && width != null && height != null
 
     fun reset() {
         resetPosition()
@@ -49,6 +53,7 @@ interface Element {
     val parent: Container?
     val size: SizeConstraints
     val placeable: Placeable
+    val transformMatrix: Mat4
 
     fun measure(container: Container?): Boolean
 

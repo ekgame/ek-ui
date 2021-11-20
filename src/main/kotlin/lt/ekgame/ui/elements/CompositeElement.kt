@@ -1,5 +1,6 @@
 package lt.ekgame.ui.elements
 
+import dev.romainguy.kotlin.math.Mat4
 import lt.ekgame.ui.Container
 import lt.ekgame.ui.Placeable
 import lt.ekgame.ui.builder.UiBuilder
@@ -16,6 +17,8 @@ abstract class CompositeElement(
 ) : AbstractContainer(id, parent, size) {
 
     lateinit var proxyContainer: Container
+
+    override val transformMatrix: Mat4 = Mat4.identity()
 
     override val placeable: Placeable
         get() = proxyContainer.placeable

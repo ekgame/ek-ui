@@ -1,5 +1,8 @@
 package lt.ekgame.ui.elements
 
+import dev.romainguy.kotlin.math.Float3
+import dev.romainguy.kotlin.math.Mat4
+import dev.romainguy.kotlin.math.translation
 import lt.ekgame.ui.*
 import lt.ekgame.ui.constraints.*
 import lt.ekgame.ui.events.*
@@ -12,8 +15,13 @@ abstract class AbstractElement(
     override val parent: Container?,
     override val size: SizeConstraints = SizeConstraints.DEFAULT,
 ) : Element {
-
     override val placeable: Placeable by lazy { BasicPlaceable(this) }
+
+    override val transformMatrix: Mat4
+        get() = when (placeable.isValid) {
+            true -> translation(Float3(placeable.x!!, placeable.y!!, 0f))
+            false -> Mat4.identity()
+        }
 
     private val listeners = mutableMapOf<KClass<*>, MutableList<EventListener<Event>>>()
 

@@ -1,8 +1,5 @@
 package lt.ekgame.ui
 
-import processing.core.PApplet
-import java.awt.Color
-
 fun List<Element>.asPlaceables() = this.map { it.placeable }
 
 fun Element.dump(depth: Int = 0): String {

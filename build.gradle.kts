@@ -12,8 +12,9 @@ repositories {
 }
 
 dependencies {
+    implementation("dev.romainguy:kotlin-math:1.0.1")
     testImplementation(kotlin("test-junit"))
-    implementation("org.processing:core:3.3.7")
+    testImplementation("org.processing:core:3.3.7")
 }
 
 tasks.test {

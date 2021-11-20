@@ -1,5 +1,7 @@
 package lt.ekgame.ui.events
 
+import dev.romainguy.kotlin.math.Float4
+import dev.romainguy.kotlin.math.inverse
 import lt.ekgame.ui.Container
 import lt.ekgame.ui.Element
 import lt.ekgame.ui.units.Point
@@ -11,10 +13,17 @@ abstract class InternalMouseEvent(
     abstract fun forPosition(position: Point): InternalMouseEvent
 
     override fun forContext(element: Element, direction: EventDirection): Event {
-        if (element is Container && element.placeable.x != null && element.placeable.y != null) {
+        if (element.placeable.x != null && element.placeable.y != null) {
+            val vector = Float4(relativePosition.x, relativePosition.y, 1f, 1f)
             val newRelativePosition = when (direction) {
-                EventDirection.UP -> relativePosition.subtract(element.placeable.x!!, element.placeable.y!!)
-                EventDirection.DOWN -> relativePosition.add(element.placeable.x!!, element.placeable.y!!)
+                EventDirection.UP -> {
+                    val newVector = inverse(element.transformMatrix).times(vector)
+                    Point(newVector.x, newVector.y)
+                }
+                EventDirection.DOWN -> {
+                    val newVector = element.transformMatrix.times(vector)
+                    Point(newVector.x, newVector.y)
+                }
             }
             return forPosition(newRelativePosition)
         }

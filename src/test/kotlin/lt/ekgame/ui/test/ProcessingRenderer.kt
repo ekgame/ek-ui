@@ -28,13 +28,20 @@ class ProcessingRenderer(val context: PApplet) : ElementRenderer {
 
     fun render(element: GenericContainer) {
         val placeable = element.placeable
-        val x = placeable.x ?: return
-        val y = placeable.y ?: return
+        if (!placeable.isValid) {
+            return
+        }
         val width = placeable.width ?: return
         val height = placeable.height ?: return
 
+        val translation = element.transformMatrix.translation
+        val scale = element.transformMatrix.scale
+        val rotation = element.transformMatrix.rotation
+
         context.pushMatrix()
-        context.translate(x, y)
+        context.translate(translation.x, translation.y)
+        context.scale(scale.x, scale.y)
+        context.rotate(rotation.x)
         if (element.background != null) {
             context.fill(context.color(element.background!!))
             context.noStroke()

@@ -1,5 +1,8 @@
 package lt.ekgame.ui.containers
 
+import dev.romainguy.kotlin.math.Float3
+import dev.romainguy.kotlin.math.Mat4
+import dev.romainguy.kotlin.math.translation
 import lt.ekgame.ui.elements.AbstractElement
 import lt.ekgame.ui.Container
 import lt.ekgame.ui.Element
@@ -11,7 +14,6 @@ import lt.ekgame.ui.constraints.SizeConstraints
 import lt.ekgame.ui.elements.CompositeElement
 import lt.ekgame.ui.events.Event
 import lt.ekgame.ui.events.EventDirection
-import processing.core.PApplet
 
 abstract class AbstractContainer(
     id: String = "",
@@ -19,6 +21,7 @@ abstract class AbstractContainer(
     override var size: SizeConstraints = SizeConstraints.DEFAULT,
     override var padding: PaddingValues = PaddingValues.ZERO,
 ) : AbstractElement(id, parent, size), Container {
+
     override val children: MutableList<Element> = mutableListOf()
 
     override val verticalFractionalSpace: FractionalSpace? = null
@@ -40,7 +43,7 @@ abstract class AbstractContainer(
             !event.isPropagating
         }
         if (contextualEvent.isPropagating) {
-            handleEvent(event)
+            handleEvent(contextualEvent)
         }
     }
 
