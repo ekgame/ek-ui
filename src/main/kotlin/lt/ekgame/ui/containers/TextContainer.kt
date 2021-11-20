@@ -17,7 +17,6 @@ class TextContainer(
     size: SizeConstraints = SizeConstraints.CONTENT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,
-    var justified: Boolean = false,
     /** The space between lines */
     var tracking: Float = 4f,
     var horizontalAlignment: Alignment = StartAlignment,
