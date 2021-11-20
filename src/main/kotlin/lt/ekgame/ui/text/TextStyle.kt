@@ -3,12 +3,12 @@ package lt.ekgame.ui.text
 import java.awt.Color
 
 data class TextStyle(
-    val font: Font,
-    val color: Color = Color.BLACK,
-    val size: Float = 12f,
-    val bold: Boolean = false,
-    val italic: Boolean = false,
-    val underline: Boolean = false,
+    var font: Font,
+    var color: Color = Color.BLACK,
+    var size: Float = 12f,
+    var bold: Boolean = false,
+    var italic: Boolean = false,
+    var underline: Boolean = false,
 ) {
     val computedFont by lazy {
         var current = font
