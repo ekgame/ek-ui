@@ -4,9 +4,11 @@ import lt.ekgame.ui.Container
 import lt.ekgame.ui.Debug
 import lt.ekgame.ui.builder.*
 import lt.ekgame.ui.constraints.*
+import lt.ekgame.ui.containers.BoxContainer
 import lt.ekgame.ui.containers.RootContainer
 import lt.ekgame.ui.dump
 import lt.ekgame.ui.elements.CompositeElement
+import lt.ekgame.ui.elements.TextLineElement
 import lt.ekgame.ui.elements.composeElement
 import lt.ekgame.ui.events.*
 import lt.ekgame.ui.listen
@@ -197,9 +199,10 @@ class UiTest : PApplet() {
      * Build a UI only using builders.
      */
     fun buildTestUi2() = buildRootUi {
-        Box(
+        Column(
             background = Color.white,
             padding = PaddingValues.of(10f),
+            gap = 10f,
         ) {
             Button("aaaaaaaaaaaaaaaaaaaaaaaa") {
                 println("aaaaaaaaaaaaaaaaaaaaaaaa: $it")
@@ -288,34 +291,41 @@ class ButtonElement(
     val onClick: (MouseClickedEvent) -> Unit = {}
 ) : CompositeElement(parent, SizeConstraints.CONTENT, id) {
 
-    override fun load() = composeElement {
-        val container = Box(
+    lateinit var container: BoxContainer
+    lateinit var textElement: TextLineElement
+
+    override fun initComposition() = composeElement {
+        container = Box(
             id = id,
             background = Color.BLACK,
             padding = PaddingValues.of(10f, 20f),
             width = ContentSize,
             height = ContentSize,
         ) {
-            Text(id.ifEmpty { text }, TextStyle(font, color = Color.WHITE))
-        }
-
-        container.listen<PointerEnteredEvent> {
-            container.background = Color.GRAY
-        }
-
-        container.listen<PointerLeftEvent> {
-            container.background = Color.BLACK
-        }
-
-        container.listen(onClick)
-
-        container.listen<Event> {
-            if (it !is InternalMouseMoveEvent) {
-                println(it)
-            }
+            textElement = Text(id.ifEmpty { text }, TextStyle(font, color = Color.WHITE))
         }
 
         container
+    }
+
+    override fun initListeners() {
+        listen<PointerEnteredEvent> {
+            container.background = Color.GRAY
+        }
+
+        listen<PointerLeftEvent> {
+            container.background = Color.BLACK
+        }
+
+        textElement.listen<PointerEnteredEvent> {
+            textElement.style.color = Color.RED
+        }
+
+        textElement.listen<PointerLeftEvent> {
+            textElement.style.color = Color.WHITE
+        }
+
+        listen(onClick)
     }
 }
 
