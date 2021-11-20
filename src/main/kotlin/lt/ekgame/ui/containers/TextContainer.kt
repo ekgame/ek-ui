@@ -17,6 +17,7 @@ class TextContainer(
     size: SizeConstraints = SizeConstraints.CONTENT,
     padding: PaddingValues = PaddingValues.ZERO,
     background: Color? = null,
+    var maxLines: Int? = null,
     /** The space between lines */
     var tracking: Float = 4f,
     var horizontalAlignment: Alignment = StartAlignment,
@@ -43,6 +44,10 @@ class TextContainer(
         }
 
         while (queue.isNotEmpty()) {
+            if (maxLines != null && flexHelper.getNumBuckets() > maxLines!!) {
+                break
+            }
+
             val placeable = queue.removeFirst()
             val currentBucketWidth = flexHelper.getCurrentBucketWidth()
             val childWidth = placeable.width ?: 0f
@@ -105,7 +110,13 @@ class TextContainer(
         var offsetX = 0f
         var offsetY = 0f
 
-        (0 until flex.getNumBuckets()).forEach { bucketIndex ->
+        val maxBucket = if (maxLines != null) {
+            maxLines!!.coerceAtMost(flex.getNumBuckets())
+        } else {
+            flex.getNumBuckets()
+        }
+
+        (0 until maxBucket).forEach { bucketIndex ->
             val bucket = flex.getBucket(bucketIndex)
             val bucketWidth = flex.getBucketWidth(bucketIndex)
             val bucketMaxHeight = flex.getBucketMaxHeight(bucketIndex)

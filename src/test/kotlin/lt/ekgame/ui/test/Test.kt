@@ -199,22 +199,17 @@ class UiTest : PApplet() {
      * Build a UI only using builders.
      */
     fun buildTestUi2() = buildRootUi {
-        Column(
-            background = Color.white,
+        Box(
+            background = Color.WHITE,
             padding = PaddingValues.of(10f),
-            gap = 10f,
+            maxHeight = ContentSize,
         ) {
-            Button("aaaaaaaaaaaaaaaaaaaaaaaa") {
-                println("aaaaaaaaaaaaaaaaaaaaaaaa: $it")
-            }
-            Button("aaaaaaaaaaaaaaaaaa") {
-                println("aaaaaaaaaaaaaaaaaa: $it")
-            }
-            Button("aaaaaaaaaaaa") {
-                println("aaaaaaaaaaaa: $it")
-            }
-            Button("aaaaaa") {
-                println("aaaaaa: $it")
+            TextContainer(
+                maxLines = 5,
+            ) {
+                Text("Contencios peregrinatione! The rumour is a photonic starship. Nutrix volares, tanquam castus ausus. ", TextStyle(font))
+                Text("Contencios peregrinatione! The rumour is a photonic starship. Nutrix volares, tanquam castus ausus. ", TextStyle(font))
+                Text("Contencios peregrinatione! The rumour is a photonic starship. Nutrix volares, tanquam castus ausus.", TextStyle(font))
             }
         }
     }

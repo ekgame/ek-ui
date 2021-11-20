@@ -259,6 +259,7 @@ fun UiBuilder.TextContainer(
     horizontalAlignment: Alignment = StartAlignment,
     verticalAlignment: Alignment = StartAlignment,
     tracking: Float = 0f,
+    maxLines: Int? = null,
     width: Size = MaxAvailable,
     height: Size = ContentSize,
     minWidth: Size = width,
@@ -275,6 +276,7 @@ fun UiBuilder.TextContainer(
         horizontalAlignment = horizontalAlignment,
         verticalAlignment = verticalAlignment,
         tracking = tracking,
+        maxLines = maxLines,
         size = SizeConstraints(
             width = width,
             height = height,
