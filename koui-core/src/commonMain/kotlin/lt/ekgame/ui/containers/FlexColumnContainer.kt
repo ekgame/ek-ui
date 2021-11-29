@@ -1,0 +1,85 @@
+package lt.ekgame.ui.containers
+
+import com.github.ajalt.colormath.Color
+import lt.ekgame.ui.*
+import lt.ekgame.ui.constraints.*
+import lt.ekgame.ui.containers.helpers.FlexPlacementHelper
+
+open class FlexColumnContainer(
+    id: String = "",
+    parent: Container?,
+    size: SizeConstraints = SizeConstraints.DEFAULT,
+    padding: PaddingValues = PaddingValues.ZERO,
+    background: Color? = null,
+    var gap: Float = 0f,
+    var horizontalAlignment: Alignment = StartAlignment,
+    var horizontalContainerAlignment: Alignment = StartAlignment,
+    var verticalAlignment: Alignment = StartAlignment,
+) : GenericContainer(id, parent, size, padding, background) {
+
+    private fun getTotalGapSize(): Float = (computedChildren.size - 1).coerceAtLeast(0)*gap
+
+    private fun getTotalChildHeightWithGaps(): Float = getTotalChildHeight() + getTotalGapSize()
+
+    private fun calculateFlex(elements: List<Placeable>): FlexPlacementHelper {
+        requireNotNull(placeable.height) { "The placeable has to have defined height to apply flex." }
+        val flexHelper = FlexPlacementHelper()
+        elements.forEach { child ->
+            val currentBucketHeight = flexHelper.getCurrentBucketHeight(gap)
+            val childHeight = child.height ?: 0f
+            if (currentBucketHeight + childHeight > getInnerHeight()) {
+                flexHelper.addBucket()
+            }
+            flexHelper.add(child)
+        }
+        return flexHelper
+    }
+
+    override fun measure(container: Container?): Boolean {
+        if (!super.measure(container) || !isValidPlaceable()) {
+            return false
+        }
+
+        val availableWidth = placeable.width!! - this.padding.horizontal
+        val availableHeight = placeable.height!! - this.padding.vertical
+
+        val childPlaceables = getRemeasuredChildren(container)
+        val flex = calculateFlex(childPlaceables)
+        val flexWidth = flex.getTotalWidth(gap)
+
+        var offsetX = 0f
+        var offsetY = 0f
+
+        (0 until flex.getNumBuckets()).forEach { bucketIndex ->
+            val bucket = flex.getBucket(bucketIndex)
+            val bucketHeight = flex.getBucketHeight(bucketIndex, gap)
+            val bucketMaxWidth = flex.getBucketMaxWidth(bucketIndex)
+            bucket.forEach {
+                it.x = padding.left + offsetX + horizontalAlignment.calculate(it.width!!, bucketMaxWidth) + horizontalContainerAlignment.calculate(flexWidth, availableWidth)
+                it.y = padding.top + offsetY + verticalAlignment.calculate(bucketHeight, availableHeight)
+                offsetY += it.height!! + gap
+            }
+            offsetY = 0f
+            offsetX += bucketMaxWidth + gap
+        }
+
+        return true
+    }
+
+    override fun recalculateContainerWidth(container: Container?) {
+        placeable.width = applyMinMaxWidth(when {
+            this.size.width is ContentSize && placeable.height != null -> {
+                val flex = calculateFlex(computedChildren.asPlaceables())
+                flex.getTotalWidth(gap) + this.padding.horizontal
+            }
+            else -> placeable.width
+        }, container)
+    }
+
+    override fun recalculateContainerHeight(container: Container?) {
+        placeable.height = applyMinMaxHeight(when (this.size.height) {
+            is ContentSize -> getTotalChildHeightWithGaps() + this.padding.vertical
+            else -> placeable.height
+        }, container)
+    }
+}
